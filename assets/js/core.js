@@ -19,6 +19,26 @@ $(document).ready(function () {
 
 	$(".pickadate").pickadate();
 
+	$("#mark-as-all-btn").on("click", function (e) {
+		e.preventDefault();
+    let user_id = $(this).data("user-id");
+		$.ajax({
+      url: mark_all_notify_url,
+      type: "POST",
+      data: { user_id: user_id},
+      dataType: "json",
+      success: function(res) {
+        if (res.result == "success") {
+          $("#notification-number").remove();
+          $("#notification-title").html("No new notification");
+          $(".notification-detail").removeClass("text-bold-700");
+        }
+      },
+      error: function(err) {
+        console.log(error);
+      }
+    });
+	});
 	/**
 	 * Customer Management Page
 	 */
@@ -158,8 +178,8 @@ $(document).ready(function () {
 	var $warning = "#FDAC41";
 	var $info = "#00CFDD";
 	var $secondary = "#828D99";
-	var $primary_light = '#E2ECFF';
-  var $gray_light = '#828D99';
+	var $primary_light = "#E2ECFF";
+	var $gray_light = "#828D99";
 	var $light_primary = "#E2ECFF";
 
 	// Bill Summary Chart
@@ -342,7 +362,7 @@ $(document).ready(function () {
 			},
 			plotOptions: {
 				radialBar: {
-					size: 100,
+					size: 120,
 					startAngle: -135,
 					endAngle: 135,
 					offsetY: 40,
@@ -367,20 +387,7 @@ $(document).ready(function () {
 					},
 				},
 			},
-			colors: ["#fff"],
-			fill: {
-				type: "gradient",
-				gradient: {
-					shade: "dark",
-					type: "horizontal",
-					shadeIntensity: 0.5,
-					gradientToColors: [$primary],
-					inverseColors: true,
-					opacityFrom: 1,
-					opacityTo: 1,
-					stops: [0, 100],
-				},
-			},
+			colors: [$primary],
 			stroke: {
 				dashArray: 3,
 			},
@@ -401,8 +408,8 @@ $(document).ready(function () {
 		// ---------
 		var analyticsBarChartOptions = {
 			chart: {
-				height: 260,
-        width: '100%',
+				height: 290,
+				width: "100%",
 				type: "bar",
 				toolbar: {
 					show: false,
@@ -427,7 +434,7 @@ $(document).ready(function () {
 			dataLabels: {
 				enabled: false,
 			},
-			colors: [$primary, $primary_light],
+			colors: [$primary, $danger],
 			fill: {
 				type: "gradient",
 				gradient: {
@@ -441,26 +448,16 @@ $(document).ready(function () {
 			},
 			series: [
 				{
-					name: "2019",
-					data: [80, 95, 150, 210, 140, 230, 300, 280, 130],
+					name: "Paid",
+					data: history_paid,
 				},
 				{
-					name: "2018",
-					data: [50, 70, 130, 180, 90, 180, 270, 220, 110],
+					name: "Unpaid",
+					data: history_unpaid,
 				},
 			],
 			xaxis: {
-				categories: [
-					"Jan",
-					"Feb",
-					"Mar",
-					"Apr",
-					"May",
-					"Jun",
-					"Jul",
-					"Aug",
-					"Sep",
-				],
+				categories: bill_history_axis,
 				axisBorder: {
 					show: false,
 				},
@@ -475,7 +472,6 @@ $(document).ready(function () {
 			},
 			yaxis: {
 				min: 0,
-				max: 300,
 				tickAmount: 3,
 				labels: {
 					style: {
@@ -489,7 +485,7 @@ $(document).ready(function () {
 			tooltip: {
 				y: {
 					formatter: function (val) {
-						return "$ " + val + " thousands";
+						return "$" + val;
 					},
 				},
 			},
