@@ -23,26 +23,27 @@ defined('BASEPATH') or exit('No direct script access allowed');
 							<tr>
 								<th data-i18n="Bill Date">Bill Date</th>
 								<th data-i18n="Bill Number">Bill Number</th>
-									<?php if (is_admin()): ?>
-										<th data-i18n="Customer">Customer</th>
-										<th data-i18n="Company">Company</th>
-									<?php endif;?>
+								<?php if (is_admin()): ?>
+									<th data-i18n="Customer">Customer</th>
+									<th data-i18n="Company">Company</th>
+								<?php endif;?>
+								<th data-i18n="">Attachment</th>
 								<th data-i18n="Product">Product</th>
 								<th data-i18n="Quantity">Quantity</th>
 								<th data-i18n="Amount">Amount</th>
 								<th data-i18n="Status">Status</th>
-									<?php if (is_admin()): ?>
-										<th></th>
-									<?php endif;?>
+								<?php if (is_admin()): ?>
+									<th></th>
+								<?php endif;?>
 							</tr>
 						</thead>
 						<tbody>
 						<?php if (empty($bills)):?>
 							<tr>
 								<?php if (is_admin()): ?>
-									<td colspan="9" class="text-center">There are no bills.</td>
+									<td colspan="9" class="text-center"> No hay facturas.</td>
 								<?php else: ?>
-									<td colspan="6" class="text-center">There are no bills.</td>
+									<td colspan="6" class="text-center">No hay facturas.</td>
 								<?php endif;?>
 							</tr>
 						<?php else: ?>
@@ -54,6 +55,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
 										<td><?= $bill['first_name'] . ' ' . $bill['surname'] ?></td>
 										<td><?= $bill['company_name'] ?></td>
 									<?php endif;?>
+									<td>
+										<?php if($bill['bill_doc'] != ''): ?>
+											<a href="<?= BILLING_DOC_URL . $bill['bill_doc']?>" target="_blank"><i class="bx bx-file-blank"></i></a>
+										<?php endif;?>
+									</td>
 									<td><?= $bill['product_name'] ?></td>
 									<td><?= $bill['quantity'] . ' kg' ?></td>
 									<td>$<?= $bill['total_amount'] ?></td>
@@ -66,8 +72,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 												<span class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
 												</span>
 												<div class="dropdown-menu dropdown-menu-right">
-													<a class="dropdown-item" href="<?= $update_url . '/' . $bill['id'] ?>"><i class="bx bx-edit-alt mr-1"></i> edit</a>
-													<a class="dropdown-item delete-bill-btn" href="<?= $delete_url . '/' . $bill['id'] ?>"><i class="bx bx-trash mr-1"></i> delete</a>
+													<a class="dropdown-item" href="<?= $update_url . '/' . $bill['id'] ?>"><i class="bx bx-edit-alt mr-1"></i> Editar</a>
+													<a class="dropdown-item delete-bill-btn" href="<?= $delete_url . '/' . $bill['id'] ?>"><i class="bx bx-trash mr-1"></i> Eliminar</a>
 												</div>
 											</div>
 										</td>
