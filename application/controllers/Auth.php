@@ -75,7 +75,41 @@ class Auth extends CI_Controller
 
     public function forgot_action()
     {
+        if ($this->input->post()) {
+            $data = $this->input->post();
+            $email = $data['email'];
+            $customer = $this->customers->get_customer_by_email($email);
+            if (!isset($customer['id']) || $customer['id'] == '') {
+                echo json_encode(['result' => 'not-exist']);
+                return;
+            }
+            if ($customer['is_verified'] != '') {
+                $this->auth->send_verify_email($customer['id']);
+            } else {
+                $this->auth->update_verify_code($customer['id']);
+                $this->auth->send_verify_email($customer['id']);
+            }
+            echo json_encode(['result' => 'success']);
+            return;
+        } else {
+            echo json_encode(['result' => 'failed']);
+            return;
+        }
+    }
 
+    public function verify_password($hash = '') {
+        if ($hash == '') {
+            redirect('auth');
+        }
+
+        $data = [
+            'login_url' => base_url('auth'),
+            'info' => $this->auth->update_password($hash) ? 'success' : 'failed'
+        ];
+
+        $this->load->view('includes/blank_header');
+        $this->load->view('auth/notify', $data);
+        $this->load->view('includes/blank_footer');
     }
 
     public function logout()
@@ -89,7 +123,7 @@ class Auth extends CI_Controller
         $id = current_customer_id();
 
         $header_data = [
-            'title' => 'Change settings',
+            'title' => 'Cambiar ajustes',
             'change_action_url' => base_url('auth/change_action/' . $id),
         ];
 
@@ -105,6 +139,24 @@ class Auth extends CI_Controller
     public function change_action($id = 0) {
         if ($this->input->post()) {
             $settings = $this->input->post();
+            $config['upload_path'] = PROFILE_IMAGE_PATH;
+            $config['allowed_types']        = 'jpg|jpeg|png|bmp';
+            $config['max_size'] = 10240;
+            $config['file_name'] = md5(time());
+
+            $this->load->library('upload', $config);
+            $origin_user = $this->customers->get_customer_by_id($id);
+            if ( $this->upload->do_upload('avatar')) {
+                $origin_file_path = PROFILE_IMAGE_PATH . $origin_user['avatar'];
+                if (@file_exists($origin_user)) {
+                    @unlink($origin_user);
+                }
+                $upload_info = $this->upload->data();
+
+                $settings['avatar'] = $upload_info['file_name'];
+            } else {
+                $settings['avatar'] = $origin_user['avatar'];
+            }
             $result = $this->auth->change($id, $settings);
             echo json_encode($result);
         } else {
